@@ -358,5 +358,5 @@ def paintClusters2D(canvas, clusters, centroids, title=""):
 fileName2='data.csv'
 dataset = loadCSV(fileName2)
 showDataset2D(dataset)
-clustering = kmeans(dataset, 5, True)
+clustering = kmeans(dataset, 4, True)
 printTable(clustering["centroids"])
