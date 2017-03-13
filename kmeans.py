@@ -136,7 +136,7 @@ def assignAll(instances, centroids):
 def computeCentroids(clusters):
     centroids = []
     for i in range(len(clusters)):
-        name = "centroid" + str(i)
+        name = "\nCentroid" + str(i+1)
         centroid = meanInstance(name, clusters[i])
         centroids.append(centroid)
     return centroids
@@ -358,5 +358,5 @@ def paintClusters2D(canvas, clusters, centroids, title=""):
 fileName2='data.csv'
 dataset = loadCSV(fileName2)
 showDataset2D(dataset)
-clustering = kmeans(dataset, 4, True)
+clustering = kmeans(dataset, 5)
 printTable(clustering["centroids"])
