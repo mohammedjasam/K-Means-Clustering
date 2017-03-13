@@ -1,6 +1,7 @@
 import os
 import subprocess
 import time
+
 print("Running Kmeans using Euclidean Distance")
 print("=======================================")
 subprocess.call(" python Kmeans_Euclidean.py 1", shell=True)
