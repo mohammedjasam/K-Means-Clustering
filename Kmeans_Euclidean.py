@@ -344,15 +344,8 @@ def paintClusters2D(canvas, clusters, centroids, title=""):
 ######################################################################
 # Test code
 ######################################################################
-# fileName1='data.csv'
 fileName2='data.csv'
-# dataset = loadCSV("data/tshirts-G.csv")
-# dataset = loadCSV(fileName2)
 dataset = loadCSV(fileName2)
-#dataset = loadCSV("/home/davide/15-110/datasets/tshirts-H.csv")
-#dataset = loadCSV("/home/davide/15-110/datasets/tshirts-I.csv")
-#dataset = loadCSV("/home/davide/15-110/datasets/tshirts-J.csv")
-#dataset = loadCSV("data/tshirts-G-nooutliers.csv")
 showDataset2D(dataset)
 clustering = kmeans(dataset, 5, True)
 printTable(clustering["centroids"])
