@@ -92,7 +92,7 @@ def cdistance(x, y):
     def magnitude(vector):
         return sqrt(dot_product(vector, vector))
     def similarity(x, y):
-        return dot_product(x, y) / (magnitude(x) * magnitude(y) + .00000000001)
+        return (1-(dot_product(x, y) / (magnitude(x) * magnitude(y) + .00000000001)))
 
 import numpy as np
 def meanInstance(name, instanceList):
