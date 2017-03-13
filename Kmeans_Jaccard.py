@@ -129,7 +129,7 @@ def assignAll(instances, centroids):
 def computeCentroids(clusters):
     centroids = []
     for i in range(len(clusters)):
-        name = "centroid" + str(i)
+        name = "\nCentroid " + str(i+1)
         centroid = meanInstance(name, clusters[i])
         centroids.append(centroid)
     return centroids

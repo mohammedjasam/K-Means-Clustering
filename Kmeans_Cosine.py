@@ -84,8 +84,17 @@ def distance(instance1, instance2):
         sumOfSquares += (instance1[i] - instance2[i])**2
     return sqrt(sumOfSquares)
 
-import numpy as np
+from scipy import spatial
+def cdistance(x, y):
+    from math import sqrt
+    def dot_product(x, y):
+        return sum(a * b for a, b in zip(x, y))
+    def magnitude(vector):
+        return sqrt(dot_product(vector, vector))
+    def similarity(x, y):
+        return dot_product(x, y) / (magnitude(x) * magnitude(y) + .00000000001)
 
+import numpy as np
 def meanInstance(name, instanceList):
     numInstances = len(instanceList)
     if (numInstances == 0):
@@ -125,7 +134,7 @@ def assignAll(instances, centroids):
 def computeCentroids(clusters):
     centroids = []
     for i in range(len(clusters)):
-        name = "centroid" + str(i)
+        name = "\nCentroid " + str(i+1)
         centroid = meanInstance(name, clusters[i])
         centroids.append(centroid)
     return centroids
@@ -167,11 +176,14 @@ def kmeans(instances, k, animation=False, initCentroids=None):
 
 def computeWithinss(clusters, centroids):
     result = 0
-    for i in range(len(centroids)):
-        centroid = centroids[i]
-        cluster = clusters[i]
-        for instance in cluster:
-            result += distance(centroid, instance)
+    try:
+        for i in range(len(centroids)):
+            centroid = centroids[i]
+            cluster = clusters[i]
+            for instance in cluster:
+                result += cdistance(centroid, instance)
+    except:
+        pass
     return result
 
 # Repeats k-means clustering n times, and returns the clustering
