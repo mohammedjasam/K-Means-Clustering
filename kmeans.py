@@ -3,6 +3,7 @@ import random
 import time
 import tkinter as tk
 from tkinter import *
+from nimblenet.cost_functions import sum_squared_error
 
 ######################################################################
 # This section contains functions for loading CSV (comma separated values)
@@ -29,6 +30,14 @@ def loadCSV(fileName):
         dataset.append(instance)
     # print(dataset)
     return dataset
+
+
+def sum_squared_error( outputs, targets, derivative = False ):
+    if derivative:
+        return outputs - targets
+    else:
+        return 0.5 * np.mean(np.sum( np.power(outputs - targets,2), axis = 1 ))
+
 
 # Converts a comma separated string into a tuple
 # Parameters
@@ -174,6 +183,7 @@ def kmeans(instances, k, animation=False, initCentroids=None):
     result["clusters"] = clusters
     result["centroids"] = centroids
     result["withinss"] = withinss
+    result["sse"]=withinss
     return result
 
 def computeWithinss(clusters, centroids):
@@ -360,3 +370,11 @@ dataset = loadCSV(fileName2)
 showDataset2D(dataset)
 clustering = kmeans(dataset, 5)
 printTable(clustering["centroids"])
+def printT(i):
+    print("\nSum of Squared Error is: "+str(i))
+printT(clustering["sse"])
+
+a=clustering["sse"]
+import csv
+with open("Kmeans_SSE.csv", "w") as fp_out:
+    print(clustering["sse"],file=fp_out)

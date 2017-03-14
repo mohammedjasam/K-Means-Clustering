@@ -3,6 +3,7 @@ import random
 import time
 import tkinter as tk
 from tkinter import *
+from nimblenet.cost_functions import sum_squared_error
 
 ######################################################################
 # This section contains functions for loading CSV (comma separated values)
@@ -29,6 +30,16 @@ def loadCSV(fileName):
         dataset.append(instance)
     # print(dataset)
     return dataset
+
+
+# def sum_squared_error( outputs, targets, derivative = False ):
+#     if derivative:
+#         print(outputs)
+#         return outputs - targets
+#     else:
+#         pass
+#         # return 0.5 * np.mean(np.sum( np.power(int(x) for x in enumerate(set(outputs)) - int(y) for y in enumerate(set(targets)),2), axis = 1 ))
+
 
 # Converts a comma separated string into a tuple
 # Parameters
@@ -75,17 +86,28 @@ def isValidNumberString(s):
 # This section contains functions for clustering a dataset
 # using the k-means algorithm.
 ######################################################################
-from math import*
+
 def distance(instance1, instance2):
     if instance1 == None or instance2 == None:
         return float("inf")
     sumOfSquares = 0
     for i in range(1, len(instance1)):
         sumOfSquares += (instance1[i] - instance2[i])**2
-    return sqrt(sumOfSquares)
-
+    return sumOfSquares
 import numpy as np
-
+# def distance(instance1, instance2):
+#     x,y=instance1,instance2
+#     covariance_xy = np.cov(x,y, rowvar=0)
+#     inv_covariance_xy = np.linalg.inv(covariance_xy)
+#     xy_mean = np.mean(x),np.mean(y)
+#     x_diff = np.array([x_i - xy_mean[0] for x_i in x])
+#     y_diff = np.array([y_i - xy_mean[1] for y_i in y])
+#     diff_xy = np.transpose([x_diff, y_diff])
+#
+#     md = []
+#     for i in range(len(diff_xy)):
+#         md.append(np.sqrt(np.dot(np.dot(np.transpose(diff_xy[i]),inv_covariance_xy),diff_xy[i])))
+#     return md
 def meanInstance(name, instanceList):
     numInstances = len(instanceList)
     if (numInstances == 0):
@@ -125,7 +147,7 @@ def assignAll(instances, centroids):
 def computeCentroids(clusters):
     centroids = []
     for i in range(len(clusters)):
-        name = "\nCentroid " + str(i+1)
+        name = "\nCentroid" + str(i+1)
         centroid = meanInstance(name, clusters[i])
         centroids.append(centroid)
     return centroids
@@ -156,7 +178,6 @@ def kmeans(instances, k, animation=False, initCentroids=None):
         prevCentroids = centroids
         centroids = computeCentroids(clusters)
         withinss = computeWithinss(clusters, centroids)
-        # sse =computeWithinss(clusters, centroids)
         if animation:
             paintClusters2D(canvas, clusters, centroids,
                             "Update %d, withinss %.1f" % (iteration, withinss))
@@ -164,7 +185,6 @@ def kmeans(instances, k, animation=False, initCentroids=None):
     result["clusters"] = clusters
     result["centroids"] = centroids
     result["withinss"] = withinss
-    result["sse"]=withinss
     return result
 
 def computeWithinss(clusters, centroids):
@@ -174,6 +194,7 @@ def computeWithinss(clusters, centroids):
         cluster = clusters[i]
         for instance in cluster:
             result += distance(centroid, instance)
+            # print(sum_squared_error(centroid,instance))
     return result
 
 # Repeats k-means clustering n times, and returns the clustering
@@ -196,16 +217,15 @@ def repeatedKMeans(instances, k, n):
 # This section contains functions for visualizing datasets and
 # clustered datasets.
 ######################################################################
-# def printT(i):
-#     print("\nSum of Squared Error is: "+str(i))
+
 def printTable(instances):
-    # print(instances)
-    for instance in instances:
-        if instance != None:
-            line = instance[0] + "\t"
-            for i in range(1, len(instance)):
-                line += "%.2f " % instance[i]
-            print (line)
+    print(instances)
+    # for instance in instances:
+    #     if instance != None:
+    #         line = instance[0] + "\t"
+    #         for i in range(1, len(instance)):
+    #             line += "%.2f " % instance[i]
+    #         print (line)
 
 def extractAttribute(instances, index):
     result = []
@@ -350,15 +370,15 @@ def paintClusters2D(canvas, clusters, centroids, title=""):
 ######################################################################
 fileName2='data.csv'
 dataset = loadCSV(fileName2)
-showDataset2D(dataset)
+# showDataset2D(dataset)
 clustering = kmeans(dataset, 5)
-printTable(clustering["centroids"])
+# with open("centroids.csv",w) as fo:
+    # printTable(clustering["centroids"])
+# printTable(clustering["clusters"])
+printTable(clustering["withinss"])
 
-def printT(i):
-    print("\nSum of Squared Error is: "+str(i))
-printT(clustering["sse"])
 
-a=clustering["sse"]
-import csv
-with open("Kmeans_Euclidean_SSE.csv", "w") as fp_out:
-    print(clustering["sse"],file=fp_out)
+# from sklearn.metrics import mean_squared_error
+# y_true = [3, -0.5, 2, 7]
+# y_pred = [2.5, 0.0, 2, 8]
+# print(mean_squared_error(y_true, y_pred))

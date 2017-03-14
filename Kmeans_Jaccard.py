@@ -167,6 +167,7 @@ def kmeans(instances, k, animation=False, initCentroids=None):
     result["clusters"] = clusters
     result["centroids"] = centroids
     result["withinss"] = withinss
+    result["sse"]=withinss
     return result
 
 def computeWithinss(clusters, centroids):
@@ -200,6 +201,7 @@ def repeatedKMeans(instances, k, n):
 ######################################################################
 
 def printTable(instances):
+    # print(instances)
     for instance in instances:
         if instance != None:
             line = instance[0] + "\t"
@@ -351,5 +353,15 @@ def paintClusters2D(canvas, clusters, centroids, title=""):
 fileName2='jdata.csv'
 dataset = loadCSV(fileName2)
 showDataset2D(dataset)
-clustering = kmeans(dataset, 5,True)
+clustering = kmeans(dataset, 5)
 printTable(clustering["centroids"])
+
+
+def printT(i):
+    print("\nSum of Squared Error is: "+str(i))
+printT(clustering["sse"])
+
+a=clustering["sse"]
+import csv
+with open("Kmeans_Jaccard_SSE.csv", "w") as fp_out:
+    print(clustering["sse"],file=fp_out)
