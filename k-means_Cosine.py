@@ -1,8 +1,8 @@
 import math
 import random
 import time
-import tkinter as tk
 from tkinter import *
+from math import *
 
 ######################################################################
 # This section contains functions for loading CSV (comma separated values)
@@ -27,7 +27,6 @@ def loadCSV(fileName):
     for line in lines:
         instance = lineToTuple(line)
         dataset.append(instance)
-    # print(dataset)
     return dataset
 
 # Converts a comma separated string into a tuple
@@ -38,7 +37,7 @@ def lineToTuple(line):
     # remove leading/trailing witespace and newlines
     cleanLine = line.strip()
     # get rid of quotes
-    cleanLine = cleanLine.replace('"s', '')
+    cleanLine = cleanLine.replace('"', '')
     # separate the fields
     lineList = cleanLine.split(",")
     # convert strings into numbers
@@ -75,26 +74,30 @@ def isValidNumberString(s):
 # This section contains functions for clustering a dataset
 # using the k-means algorithm.
 ######################################################################
-from math import*
+
 def distance(instance1, instance2):
     if instance1 == None or instance2 == None:
         return float("inf")
     sumOfSquares = 0
     for i in range(1, len(instance1)):
         sumOfSquares += (instance1[i] - instance2[i])**2
-    return sqrt(sumOfSquares)
+    return sumOfSquares
 
-from scipy import spatial
-def cdistance(x, y):
-    from math import sqrt
-    def dot_product(x, y):
-        return sum(a * b for a, b in zip(x, y))
-    def magnitude(vector):
-        return sqrt(dot_product(vector, vector))
-    def similarity(x, y):
-        return (1-(dot_product(x, y) / (magnitude(x) * magnitude(y) + .00000000001)))
+# Calculate Euclidean distance
+# def distance(x,y):
+#     result = []
+#     for a, b in zip(x, y):
+#         result.append(pow(int(a)-int(b),2))
+#     return (sqrt(sum(result)))
 
-import numpy as np
+#Calculate cosine distance
+def square_rooted(x):
+    return round(sqrt(sum([a*a for a in x])),3)
+def cdistance(x,y):
+    numerator = sum([a*b for a,b in zip(x,list(y))])
+    denominator = square_rooted(x)*square_rooted(y)
+    return (1-round(numerator/float(denominator),3))
+
 def meanInstance(name, instanceList):
     numInstances = len(instanceList)
     if (numInstances == 0):
@@ -110,9 +113,12 @@ def meanInstance(name, instanceList):
 
 def assign(instance, centroids):
     minDistance = distance(instance, centroids[0])
+    # print ('centroid index: 0')
     minDistanceIndex = 0
     for i in range(1, len(centroids)):
         d = distance(instance, centroids[i])
+        # print ('centroid index: {}'.format(i))
+        # print centroids[i]
         if (d < minDistance):
             minDistance = d
             minDistanceIndex = i
@@ -134,7 +140,8 @@ def assignAll(instances, centroids):
 def computeCentroids(clusters):
     centroids = []
     for i in range(len(clusters)):
-        name = "\nCentroid " + str(i+1)
+        # name = "centroid" + str(i)
+        name = i
         centroid = meanInstance(name, clusters[i])
         centroids.append(centroid)
     return centroids
@@ -145,11 +152,13 @@ def kmeans(instances, k, animation=False, initCentroids=None):
         # randomly select k initial centroids
         random.seed(time.time())
         centroids = random.sample(instances, k)
+        # print ()"Printing centroid"
+        # print centroids
     else:
         centroids = initCentroids
     prevCentroids = []
     if animation:
-        delay = 1.0 # seconds
+        delay = 10.0 # seconds
         canvas = prepareWindow(instances)
         clusters = createEmptyListOfLists(k)
         clusters[0] = instances
@@ -158,12 +167,15 @@ def kmeans(instances, k, animation=False, initCentroids=None):
     iteration = 0
     while (centroids != prevCentroids):
         iteration += 1
+        # print '#iter: {}'.format(iteration)
         clusters = assignAll(instances, centroids)
         if animation:
             paintClusters2D(canvas, clusters, centroids, "Assign %d" % iteration)
             time.sleep(delay)
         prevCentroids = centroids
+        # print centroids
         centroids = computeCentroids(clusters)
+
         withinss = computeWithinss(clusters, centroids)
         if animation:
             paintClusters2D(canvas, clusters, centroids,
@@ -172,19 +184,15 @@ def kmeans(instances, k, animation=False, initCentroids=None):
     result["clusters"] = clusters
     result["centroids"] = centroids
     result["withinss"] = withinss
-    result["sse"]=withinss
     return result
 
 def computeWithinss(clusters, centroids):
     result = 0
-    try:
-        for i in range(len(centroids)):
-            centroid = centroids[i]
-            cluster = clusters[i]
-            for instance in cluster:
-                result += cdistance(centroid, instance)
-    except:
-        pass
+    for i in range(len(centroids)):
+        centroid = centroids[i]
+        cluster = clusters[i]
+        for instance in cluster:
+            result += cdistance(centroid, instance)
     return result
 
 # Repeats k-means clustering n times, and returns the clustering
@@ -193,8 +201,8 @@ def repeatedKMeans(instances, k, n):
     bestClustering = {}
     bestClustering["withinss"] = float("inf")
     for i in range(1, n+1):
-        print ("k-means trial %d," % i)
-        trialClustering = kmeans(instances, k)
+        print ("k-means trial %d," % i ,
+        trialClustering = kmeans(instances, k))
         print ("withinss: %.1f" % trialClustering["withinss"])
         if trialClustering["withinss"] < bestClustering["withinss"]:
             bestClustering = trialClustering
@@ -209,12 +217,18 @@ def repeatedKMeans(instances, k, n):
 ######################################################################
 
 def printTable(instances):
-    # print(instances)
     for instance in instances:
         if instance != None:
-            line = instance[0] + "\t"
+            # line = instance[0] + "\t"
+            line = instance[0]
+            # print instance
+            # print len(instance)
             for i in range(1, len(instance)):
-                line += "%.2f " % instance[i]
+                # print instance[i]
+                # line1 = "%.2f" % (instance[i])
+                # line = line + float(line1)
+                # print float(instance[i])
+                line += float("%.2f" % instance[i])
             print (line)
 
 def extractAttribute(instances, index):
@@ -286,7 +300,6 @@ def prepareWindow(instances):
     setBounds2D(canvas, instances)
     paintAxes(canvas)
     canvas.update()
-    root.lift()
     return canvas
 
 def setBounds2D(canvas, instances):
@@ -358,15 +371,12 @@ def paintClusters2D(canvas, clusters, centroids, title=""):
 ######################################################################
 # Test code
 ######################################################################
-fileName2='data.csv'
-dataset = loadCSV(fileName2)
+dataset = loadCSV("dummy.csv")
 showDataset2D(dataset)
-clustering = kmeans(dataset, 5)
-printTable(clustering["centroids"])
+clustering = kmeans(dataset, 3)
+print("\nSum of Squared Error is: "+str(clustering["withinss"]))
 
-# printT(clustering["sse"])
-
-a=clustering["sse"]
+a=clustering["withinss"]
 import csv
 with open("Kmeans_cosine_SSE.csv", "w") as fp_out:
-    print(clustering["sse"],file=fp_out)
+    print(clustering["withinss"],file=fp_out)

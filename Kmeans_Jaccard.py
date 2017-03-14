@@ -356,12 +356,15 @@ showDataset2D(dataset)
 clustering = kmeans(dataset, 5)
 printTable(clustering["centroids"])
 
-
+# printT(clustering["clusters"])
 def printT(i):
     print("\nSum of Squared Error is: "+str(i))
+# printT(clustering["clusters"])
 printT(clustering["sse"])
-
+# printTable(clustering["clusters"])
 a=clustering["sse"]
+
+
 import csv
 with open("Kmeans_Jaccard_SSE.csv", "w") as fp_out:
     print(clustering["sse"],file=fp_out)
